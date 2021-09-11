@@ -3,6 +3,7 @@ void setup(){
   pinMode(4, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(13, OUTPUT);
+  CORE_PIN4_CONFIG = IOMUXC_PAD_DSE(7);
 }
 
 int currentCommand = -1;
