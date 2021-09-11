@@ -5,7 +5,7 @@ void setup(){
   pinMode(4, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(13, OUTPUT);
-  myTimer.begin(timerCommand, 20);
+  myTimer.begin(timerCommand, 50);
 }
 
 volatile int currentCommand = -1;
