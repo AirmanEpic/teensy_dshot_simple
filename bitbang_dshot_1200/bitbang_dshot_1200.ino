@@ -1,11 +1,14 @@
+IntervalTimer myTimer;
+
 void setup(){
   Serial.begin(9600);
   pinMode(4, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(13, OUTPUT);
+  myTimer.begin(timerCommand, 20);
 }
 
-int currentCommand = -1;
+volatile int currentCommand = -1;
 int lastCommandAt = 0;
 
 // #define NOP __asm__ __volatile__ ("nop\n\t")
@@ -41,15 +44,19 @@ void loop(){
 
   // if (minus)
   //  recv_data *= -1;
+  
+  
   while (Serial.available()){
     String a = Serial.readString();
     Serial.println("Received Signal: "+a);
     handleCommand(a);
   }
+}
 
-  if (currentCommand != -1)
-  sendSingleCommand(currentCommand);
-//    sendCalibrateCommand();
+void timerCommand(){
+  if (currentCommand != -1){
+    sendSingleCommand(currentCommand);
+  }
 }
 
 void handleCommand(String command){
@@ -93,10 +100,15 @@ void handleCommand(String command){
   }
 
   if (codeCommand == -1){
-    return -1;
+    codeCommand = command.toInt();
   }
 
+  if (codeCommand == -1){
+    return -1;
+  }
+ noInterrupts();
  currentCommand = codeCommand;
+ interrupts();
 }
 
 void sendCalibrateCommand(){
@@ -113,33 +125,7 @@ void sendSingleCommand(int code){
   int T1H = 1250;
   int T0H = 625;
   int periodTime = 1670;
-  if (code == 2040){
-    signal = 0b11111111000;
-  }
-
-  if (code == 50){
-    signal = 0b110010;
-  }
-
-  if (code == 150){
-    signal = 0b10010110;
-  }
-
-  if (code == 1024){
-    signal = 0b10000000000;
-  }
-
-  if (code == 47){
-    signal = 0b00101111;
-  }
-
-  if (code == 48){
-    signal = 0b110000;
-  }
-
-  if (code == 0){
-    signal = 0b00000000000;
-  }
+  signal = code;
   int startTime = micros();
   digitalWrite(13, HIGH);
 
@@ -180,7 +166,7 @@ void sendSingleCommand(int code){
   digitalWrite(4,LOW);
   digitalWrite(13, LOW);
 
-  delayMicroseconds(21*periodTime/1000);
+//  delayMicroseconds(21*periodTime/1000);
 }
 
 /* One nop is 1.66ns (1/cpu frequency, so 1/600000000 here) and one cycle of the for loop is another cycle,
