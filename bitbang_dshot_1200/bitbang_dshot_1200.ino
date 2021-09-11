@@ -3,7 +3,6 @@ void setup(){
   pinMode(4, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(13, OUTPUT);
-  CORE_PIN4_CONFIG = IOMUXC_PAD_DSE(7);
 }
 
 int currentCommand = -1;
@@ -90,7 +89,7 @@ void handleCommand(String command){
 
   if (command == "max"){
     Serial.println("maxing throttle");
-    codeCommand = 2047;
+    codeCommand = 47;
   }
 
   if (codeCommand == -1){
@@ -130,8 +129,8 @@ void sendSingleCommand(int code){
     signal = 0b10000000000;
   }
 
-  if (code == 2047){
-    signal = 0b11111111111;
+  if (code == 47){
+    signal = 0b00101111;
   }
 
   if (code == 48){
@@ -160,10 +159,9 @@ void sendSingleCommand(int code){
   bool leading = false;
   for (int i = sizeof(packet) * 8 - 1; i>=0; i--){
     int bit = (packet >> i) & 1;
-    leading |= bit;
 
     digitalWrite(4,HIGH);
-    if (leading){
+    if (bit){
       delayNS(T1H - 17 - 40); // I looked at what I should get for a delay and what I actually got and subtracted (and added in one instance, dunno wtf is up there) the difference between expected and measured values
     }
     else{
@@ -171,7 +169,7 @@ void sendSingleCommand(int code){
     }
     digitalWrite(4, LOW);
 
-    if (leading){
+    if (bit){
       delayNS(periodTime - T1H - 17 + 80);
     }
     else{
