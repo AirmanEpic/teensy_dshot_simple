@@ -162,7 +162,7 @@ void sendSingleCommand(int code){
     leading |= bit;
 
     digitalWrite(4,HIGH);
-    if (!leading){
+    if (leading){
       delayNS(T1H - 17 - 40); // I looked at what I should get for a delay and what I actually got and subtracted (and added in one instance, dunno wtf is up there) the difference between expected and measured values
     }
     else{
@@ -170,7 +170,7 @@ void sendSingleCommand(int code){
     }
     digitalWrite(4, LOW);
 
-    if (!leading){
+    if (leading){
       delayNS(periodTime - T1H - 17 + 80);
     }
     else{
